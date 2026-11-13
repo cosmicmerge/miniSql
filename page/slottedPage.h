@@ -1,0 +1,41 @@
+#pragma once
+#include<cstdint>
+#include<cstring>
+
+struct PageHeader {
+    uint16_t free_space_offset;
+    uint16_t slot_count;
+};
+
+#pragma pack(push,1) //here compiler will not add any padding between the members of the struct. This is important for ensuring that the struct has a consistent size and layout in memory, which is necessary for reading and writing data to disk or across networks.
+
+struct Slot{
+    uint8_t is_deleted;
+    uint16_t length;
+    uint16_t offset;
+};
+
+#pragma pack(pop)
+
+class Slotted_Page{
+    private:
+    char* data;  // Pointer to the raw page data 4kb
+
+    public:
+
+    Slotted_Page(char *page_data);
+
+    void initialize();
+
+    
+
+    void set_header(const PageHeader& header);
+    PageHeader get_header();
+
+    void set_slot(uint16_t slot_id, Slot& slot);
+    Slot get_slot(const uint16_t slot_id);
+    
+    int insert(const char* record ,uint16_t length);
+    void read(uint16_t slot_id,char* out_buffer);
+    void remove(uint16_t slot_id);
+};
